@@ -6,13 +6,13 @@ module Zip
     EFS = 0b100000000000
 
     attr_accessor :comment, :compressed_size, :crc, :extra, :compression_method,
-                  :name, :size, :local_header_offset, :zipfile, :fstype, :external_file_attributes,
+                  :size, :local_header_offset, :zipfile, :fstype, :external_file_attributes,
                   :internal_file_attributes,
                   :gp_flags, :header_signature, :follow_symlinks,
                   :restore_times, :restore_permissions, :restore_ownership,
                   :unix_uid, :unix_gid, :unix_perms,
                   :dirty
-    attr_reader :ftype, :filepath # :nodoc:
+    attr_reader :name, :ftype, :filepath # :nodoc:
 
     def set_default_vars_values
       @local_header_offset      = 0
@@ -84,6 +84,13 @@ module Zip
     end
 
     alias mtime time
+
+    def name=(value)
+      @name = value
+
+      return unless @extra.member?('UnicodePath')
+      @extra['UnicodePath'].entry_name = value
+    end
 
     def time=(value)
       unless @extra.member?('UniversalTime') || @extra.member?('NTFS')
